@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"html/template"
 	"log"
-	"os"
 )
 
 // Field represents a field of the model
@@ -66,12 +66,16 @@ func (m *Models) AddField(name, exportedType, description string) {
 	(*m)[lastIndex].Fields = append((*m)[lastIndex].Fields, field)
 }
 
-// Print method prints created models to console
-func (m *Models) Print() {
+// String method converts Models to string and returns it
+func (m *Models) String() string {
 	t := template.Must(template.New("models").Parse(modelsTmpl))
 
-	err := t.Execute(os.Stdout, *m)
+	var buf bytes.Buffer
+
+	err := t.Execute(&buf, *m)
 	if err != nil {
 		log.Fatalf("executing template: %v", err)
 	}
+
+	return buf.String()
 }

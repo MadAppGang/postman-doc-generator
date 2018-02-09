@@ -23,20 +23,20 @@ func main() {
 		log.Fatalf("Cannot create a config. %v", err)
 	}
 
-	structures := cfg.GetModels()
+	models := cfg.Parse()
 
-	structures.Print()
+	fmt.Println(models.String())
 }
 
-// Config represents a model for storing settings
-type Config struct {
+// ParserConfig represents a model for storing parser settings
+type ParserConfig struct {
 	filename string
 	file     *ast.File
 }
 
 // NewConfig initializes new config by given filename and returns it
 // Non nil verbose error returns if something goes wrong
-func NewConfig(filename string) (*Config, error) {
+func NewConfig(filename string) (*ParserConfig, error) {
 	// Create the AST by given filename
 	fset := token.NewFileSet()
 	file, err := parser.ParseFile(fset, filename, nil, 0)
@@ -44,7 +44,7 @@ func NewConfig(filename string) (*Config, error) {
 		return nil, fmt.Errorf("Cannot parse given file. %v", err.Error())
 	}
 
-	config := Config{
+	config := ParserConfig{
 		filename: filename,
 		file:     file,
 	}
@@ -52,8 +52,8 @@ func NewConfig(filename string) (*Config, error) {
 	return &config, nil
 }
 
-// GetModels method inspects nodes in the file, adds found structures to the models array and returns it
-func (c *Config) GetModels() Models {
+// Parse method inspects nodes in the file, adds found structures to the models array and returns it
+func (c *ParserConfig) Parse() Models {
 	var models Models
 
 	ast.Inspect(c.file, func(x ast.Node) bool {
