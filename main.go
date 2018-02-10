@@ -9,20 +9,26 @@ import (
 )
 
 func main() {
-	currentDir, err := getCurrentDir()
-	if err != nil {
-		log.Fatalf("Cannot get current dir. %v", err)
-	}
-
 	// get path from arguments or set current dir
-	path := flag.String("p", currentDir, "Path to source files")
+	flagPath := flag.String("p", "", "Path to source files")
 	flag.Parse()
+
+	if flagPath == nil {
+		log.Fatal("Cannot get command line arguments")
+	} else if *flagPath == "" {
+		currentDir, err := getCurrentDir()
+		if err != nil {
+			log.Fatalf("Cannot get current dir. %v", err)
+		}
+
+		*flagPath = currentDir
+	}
 
 	// create a new generator
 	generator := NewGenerator()
-	models, err := generator.ParseAll(*path)
+	models, err := generator.ParseAll(*flagPath)
 	if err != nil {
-		log.Fatalf("Cannot parse files. %v", err)
+		log.Fatal(err)
 	}
 
 	// print created models

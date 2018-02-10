@@ -45,7 +45,7 @@ func (g *Generator) ParseAll(path string) (Models, error) {
 
 		err = g.Parse(file)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot parse file. %v", err)
+			return nil, err
 		}
 	}
 
@@ -68,8 +68,13 @@ func (g *Generator) Parse(filename string) error {
 			g.models.Add(node.Name.Name)
 		case *ast.StructType:
 			for _, field := range node.Fields.List {
+				if field.Tag == nil {
+					// when tag is missing
+					continue
+				}
+
 				tag := field.Tag.Value
-				tag = strings.Replace(tag, "`", "", -1)
+				tag = strings.Replace(tag, "`", "", -1) // remove '`' symbols from string
 				structTag := reflect.StructTag(tag)
 
 				json := structTag.Get(nameKey)
