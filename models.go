@@ -71,6 +71,14 @@ func (m *Models) AddField(name, exportedType, description string) {
 	(*m)[lastIndex].Fields = append((*m)[lastIndex].Fields, field)
 }
 
+func (m Models) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+func (m Models) Less(i, j int) bool {
+	return len(m[i].Name) < len(m[j].Name)
+}
+
 // String method converts Models to string and returns it
 func (m Models) String() string {
 	t := template.Must(template.New("models").Parse(modelsTmpl))

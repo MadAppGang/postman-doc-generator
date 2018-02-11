@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
 const defaultPhrase = "$models"
@@ -16,6 +17,10 @@ func main() {
 	flagPhrase := flag.String("phrase", defaultPhrase, "The phrase to insert models")
 	flag.Parse()
 
+	if *flagCollectionPath == "" {
+		log.Fatal("Collection path is required")
+	}
+
 	if *flagSourcesPath == "" {
 		currentDir, err := getCurrentDir()
 		if err != nil {
@@ -25,16 +30,14 @@ func main() {
 		*flagSourcesPath = currentDir
 	}
 
-	if *flagCollectionPath == "" {
-		log.Fatal("Collection path is required")
-	}
-
 	// create a new generator
 	generator := NewGenerator()
 	err := generator.ParseAll(*flagSourcesPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	sort.Sort(generator.GetModels())
 
 	generator.Inject(*flagCollectionPath, *flagPhrase)
 }

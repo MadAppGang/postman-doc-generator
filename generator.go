@@ -92,6 +92,11 @@ func (g *Generator) Parse(filename string) error {
 	return nil
 }
 
+// GetModels returns created models
+func (g *Generator) GetModels() Models {
+	return g.models
+}
+
 // Inject method replaces given phrase in the file with the models
 // Non nil verbose error returns if something goes wrong
 func (g *Generator) Inject(filename, phrase string) error {
