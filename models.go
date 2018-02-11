@@ -52,12 +52,17 @@ func (m *Models) Add(name string) {
 	*m = append(*m, *NewModel(name))
 }
 
+// Len returns a count of models in the array
+func (m Models) Len() int {
+	return len(m)
+}
+
 // AddField method creates a field by given parameters and adds to last model
 // If the models do not exist, creates a new
 func (m *Models) AddField(name, exportedType, description string) {
 	field := NewField(name, exportedType, description)
 
-	if len(*m) == 0 {
+	if m.Len() == 0 {
 		// if the array is empty, create a new model
 		m.Add("Unknown")
 	}
@@ -67,12 +72,11 @@ func (m *Models) AddField(name, exportedType, description string) {
 }
 
 // String method converts Models to string and returns it
-func (m *Models) String() string {
+func (m Models) String() string {
 	t := template.Must(template.New("models").Parse(modelsTmpl))
 
 	var buf bytes.Buffer
-
-	err := t.Execute(&buf, *m)
+	err := t.Execute(&buf, m)
 	if err != nil {
 		log.Fatalf("executing template: %v", err)
 	}

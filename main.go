@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// print created models
-	fmt.Println(models.String())
+	fmt.Println(models)
 }
 
 // getCurrentDir returns the current directory
