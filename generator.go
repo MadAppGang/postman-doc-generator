@@ -66,7 +66,7 @@ func (g *Generator) Parse(filename string) error {
 	ast.Inspect(file, func(x ast.Node) bool {
 		switch node := x.(type) {
 		case *ast.TypeSpec:
-			g.models.Add(node.Name.Name)
+			g.models = g.models.Add(node.Name.Name)
 		case *ast.StructType:
 			for _, field := range node.Fields.List {
 				if field.Tag == nil {

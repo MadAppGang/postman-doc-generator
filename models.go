@@ -48,18 +48,13 @@ func (s *Model) Add(field Field) {
 type Models []Model
 
 // Add method adds given model to array of models
-func (m *Models) Add(name string) {
-	*m = append(*m, *NewModel(name))
-}
-
-// Len returns a count of models in the array
-func (m Models) Len() int {
-	return len(m)
+func (m Models) Add(name string) Models {
+	return append(m, *NewModel(name))
 }
 
 // AddField method creates a field by given parameters and adds to last model
 // If the models do not exist, creates a new
-func (m *Models) AddField(name, exportedType, description string) {
+func (m Models) AddField(name, exportedType, description string) {
 	field := NewField(name, exportedType, description)
 
 	if m.Len() == 0 {
@@ -67,8 +62,8 @@ func (m *Models) AddField(name, exportedType, description string) {
 		m.Add("Unknown")
 	}
 
-	lastIndex := len(*m) - 1
-	(*m)[lastIndex].Fields = append((*m)[lastIndex].Fields, field)
+	lastIndex := len(m) - 1
+	m[lastIndex].Fields = append(m[lastIndex].Fields, field)
 }
 
 func (m Models) Swap(i, j int) {
@@ -79,7 +74,6 @@ func (m Models) Less(i, j int) bool {
 	return len(m[i].Name) < len(m[j].Name)
 }
 
-// String method converts Models to string and returns it
 func (m Models) String() string {
 	t := template.Must(template.New("models").Parse(modelsTmpl))
 
@@ -90,4 +84,8 @@ func (m Models) String() string {
 	}
 
 	return buf.String()
+}
+
+func (m Models) Len() int {
+	return len(m)
 }
