@@ -1,0 +1,37 @@
+{
+	"info": {
+		"name": "Test",
+		"_postman_id": "9cc3c0f6-4f0a-aa48-272a-1e37eba4491a",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Models",
+			"description": "$models",
+			"item": [],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0c56b675-f324-43cf-8c5a-f6f267b11702",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "2078846f-936b-4cc1-b588-64f296d6c8f3",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
