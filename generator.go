@@ -25,7 +25,11 @@ type Generator struct {
 
 // NewGenerator initializes new config by given filename and returns it
 func NewGenerator() *Generator {
-	return &Generator{}
+	models := make(Models)
+
+	return &Generator{
+		models: models,
+	}
 }
 
 // ParseAll method parses all *.go files, creates models from structures and returns it
@@ -66,30 +70,70 @@ func (g *Generator) Parse(filename string) error {
 	ast.Inspect(file, func(x ast.Node) bool {
 		switch node := x.(type) {
 		case *ast.TypeSpec:
-			g.models = g.models.Add(node.Name.Name)
-		case *ast.StructType:
-			for _, field := range node.Fields.List {
-				if field.Tag == nil {
-					// when tag is missing
-					continue
-				}
+			typeName := node.Name.Name
 
-				tag := field.Tag.Value
-				tag = strings.Replace(tag, "`", "", -1) // remove '`' symbols from string
-				structTag := reflect.StructTag(tag)
-
-				json := structTag.Get(nameKey)
-				export := structTag.Get(typeKey)
-				description := structTag.Get(descriptionKey)
-
-				g.models.AddField(json, export, description)
-			}
+			g.parseStruct(typeName, node.Type)
 		}
 
 		return true
 	})
 
 	return nil
+}
+
+// parseStruct passes through given node in search of StructType and adds found structure fields to models
+func (g *Generator) parseStruct(name string, node ast.Expr) {
+	switch subNode := node.(type) {
+	case *ast.StructType:
+		for _, field := range subNode.Fields.List {
+			// try to go down in tree
+			for _, ident := range field.Names {
+				g.parseStruct(ident.Name, field.Type)
+			}
+
+			if field.Tag == nil {
+				// when tag is missing
+				return
+			}
+
+			field := parseTag(field.Tag.Value)
+
+			g.models.AddField(name, field)
+		}
+	}
+}
+
+// parseTag parses given tag, creates a tag and returns it
+func parseTag(tag string) Field {
+	tag = strings.Replace(tag, "`", "", -1) // remove '`' symbols from string
+	structTag := reflect.StructTag(tag)
+
+	name := structTag.Get(nameKey)
+	if strings.ContainsAny(name, ",") {
+		name = getFirstSubstring(name)
+	}
+
+	kind := structTag.Get(typeKey) // kind is exported type
+	description := structTag.Get(descriptionKey)
+
+	return NewField(name, kind, description)
+}
+
+// getSubstring splits given string by comma separator and returns substring by given index
+// if the index is greater than the length of the slide, returns empty string
+func getSubstring(s string, index int) string {
+	slice := strings.Split(s, ",")
+
+	if len(slice) >= index {
+		return slice[index]
+	}
+
+	return ""
+}
+
+// getFirstSubstring returns the first substring with index 0 for given string
+func getFirstSubstring(s string) string {
+	return getSubstring(s, 0)
 }
 
 // GetModels returns created models

@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 )
 
 const defaultPhrase = "$models"
@@ -36,8 +35,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	sort.Sort(generator.GetModels())
 
 	generator.Inject(*flagCollectionPath, *flagPhrase)
 }

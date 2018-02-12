@@ -32,46 +32,21 @@ type Model struct {
 	Fields Fields
 }
 
-// NewModel method initializes new model by given name and returns it
-func NewModel(name string) *Model {
-	return &Model{
-		Name: name,
-	}
-}
-
-// Add method adds given field to fields array
-func (s *Model) Add(field Field) {
-	s.Fields = append(s.Fields, field)
+// AddField method adds given field to fields array
+func (m Model) AddField(field Field) Fields {
+	return append(m.Fields, field)
 }
 
 // Models type represents an array of model
-type Models []Model
-
-// Add method adds given model to array of models
-func (m Models) Add(name string) Models {
-	return append(m, *NewModel(name))
-}
+type Models map[string]Model
 
 // AddField method creates a field by given parameters and adds to last model
 // If the models do not exist, creates a new
-func (m Models) AddField(name, exportedType, description string) {
-	field := NewField(name, exportedType, description)
+func (m Models) AddField(modelName string, field Field) {
+	model := m[modelName]
+	model.Fields = model.AddField(field)
 
-	if m.Len() == 0 {
-		// if the array is empty, create a new model
-		m.Add("Unknown")
-	}
-
-	lastIndex := len(m) - 1
-	m[lastIndex].Fields = append(m[lastIndex].Fields, field)
-}
-
-func (m Models) Swap(i, j int) {
-	m[i], m[j] = m[j], m[i]
-}
-
-func (m Models) Less(i, j int) bool {
-	return len(m[i].Name) < len(m[j].Name)
+	m[modelName] = model
 }
 
 func (m Models) String() string {
@@ -84,8 +59,4 @@ func (m Models) String() string {
 	}
 
 	return buf.String()
-}
-
-func (m Models) Len() int {
-	return len(m)
 }

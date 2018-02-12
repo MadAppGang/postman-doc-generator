@@ -1,6 +1,6 @@
 package main
 
-var modelsTmpl = `{{range $i, $model := .}}# {{$model.Name}}
+var modelsTmpl = `{{range $key, $model := .}}# {{$key}}
 
 Parameter | Type | Description
 --------- | ---- | -----------{{range $y, $field := $model.Fields}}
