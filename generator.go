@@ -25,10 +25,8 @@ type Generator struct {
 
 // NewGenerator initializes new config by given filename and returns it
 func NewGenerator() *Generator {
-	models := make(Models)
-
 	return &Generator{
-		models: models,
+		models: make(Models),
 	}
 }
 
@@ -39,6 +37,8 @@ func (g *Generator) ParseAll(path string) error {
 	if err != nil {
 		return fmt.Errorf("Cannot read dir. %v", err)
 	}
+
+	files = g.excludeTestFiles(files)
 
 	for _, file := range files {
 		isDir, err := isDir(file)
@@ -86,21 +86,52 @@ func (g *Generator) parseStruct(name string, node ast.Expr) {
 	switch subNode := node.(type) {
 	case *ast.StructType:
 		for _, field := range subNode.Fields.List {
-			// try to go down in tree
-			for _, ident := range field.Names {
-				g.parseStruct(ident.Name, field.Type)
+			// try to parse nested structures
+			g.parseStruct(name, field.Type)
+
+			// create a field
+			createdField := g.createField(field)
+			if createdField.Name == "-" {
+				continue
 			}
 
-			if field.Tag == nil {
-				// when tag is missing
-				return
-			}
-
-			field := parseTag(field.Tag.Value)
-
-			g.models.AddField(name, field)
+			g.models.AddField(name, createdField)
 		}
+	case *ast.ArrayType:
+		// try to find struct in array
+		g.parseStruct(name, subNode.Elt)
 	}
+}
+
+// createField creates a model field by given ast.Field and returns it
+func (g *Generator) createField(field *ast.Field) Field {
+	var fieldName, fieldType, fieldDescription string
+
+	// try to get parameters from the tag
+	if field.Tag != nil {
+		tag := field.Tag.Value
+		tag = strings.Replace(tag, "`", "", -1) // remove '`' symbols from string
+		structTag := reflect.StructTag(tag)
+
+		fieldName = structTag.Get(nameKey)
+		if strings.ContainsAny(fieldName, ",") {
+			fieldName = getFirstSubstring(fieldName)
+		}
+
+		fieldType = structTag.Get(typeKey)
+		fieldDescription = structTag.Get(descriptionKey)
+	}
+
+	if fieldType != "" {
+		fieldType = createMarkdownLink(fieldType)
+	}
+
+	return NewField(fieldName, fieldType, fieldDescription)
+}
+
+// createMarkdownLink creates markdown link from given string and returns it
+func createMarkdownLink(s string) string {
+	return fmt.Sprintf("[%s](#%s)", s, strings.ToLower(s))
 }
 
 // parseTag parses given tag, creates a tag and returns it
@@ -141,9 +172,9 @@ func (g *Generator) GetModels() Models {
 	return g.models
 }
 
-// Inject method replaces given phrase in the file with the models
+// Insert method replaces given phrase in the file with the models
 // Non nil verbose error returns if something goes wrong
-func (g *Generator) Inject(filename, phrase string) error {
+func (g *Generator) Insert(filename, phrase string) error {
 	models := fmt.Sprintf("%q", g.models)
 	models = strings.Replace(models, "\"", "", -1)
 
@@ -163,4 +194,17 @@ func isDir(path string) (bool, error) {
 	fileInfo, err := os.Stat(path)
 
 	return fileInfo.IsDir(), err
+}
+
+// excludeTestFiles returns a new slice without test files
+func (g *Generator) excludeTestFiles(files []string) []string {
+	var newSlice []string
+
+	for _, f := range files {
+		if !strings.HasSuffix(f, "_test.go") {
+			newSlice = append(newSlice, f)
+		}
+	}
+
+	return newSlice
 }

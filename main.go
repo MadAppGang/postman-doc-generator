@@ -36,7 +36,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	generator.Inject(*flagCollectionPath, *flagPhrase)
+	generator.Insert(*flagCollectionPath, *flagPhrase)
 }
 
 // getCurrentDir returns the current directory
