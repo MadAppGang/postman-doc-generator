@@ -1,1 +1,4 @@
 coverage.out
+postman-doc-generator
+*.md
+*.ast
