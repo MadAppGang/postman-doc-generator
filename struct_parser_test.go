@@ -34,12 +34,15 @@ var userModel = models.Model{
 }
 
 func TestGetStruct(t *testing.T) {
-	p := NewParser()
-	p.ParseSource(userStruct)
+	sp := NewStructParser()
+	sp.ParseSource(userStruct)
 
-	got := p.GetStruct(structName)
+	got, err := sp.GetStruct(structName)
+	if err != nil {
+		t.Fatalf("GetStruct (%q) was incorrect, got: %v, want: %v.", userStruct, err, nil)
+	}
 	if got == nil {
-		t.Fatalf("GetStruct (%q) was incorrect, got: %v, want: %v.", userStruct, got, "*ast.StructType")
+		t.Fatalf("GetStruct (%q) was incorrect, got: %v, want: %v.", userStruct, got, "")
 	}
 }
 
@@ -47,11 +50,11 @@ func TestStructToModel(t *testing.T) {
 	in := userStruct
 	want := userModel
 
-	p := NewParser()
-	p.ParseSource(in)
-	st := p.GetStruct(want.Name)
+	sp := NewStructParser()
+	sp.ParseSource(in)
+	st, _ := sp.GetStruct(want.Name)
 
-	got := *structToModel(want.Name, st)
+	got := *structToModel(want.Name, *st)
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("StructToModel (%q) was incorrect, got: %q, want: %q.", in, got, want)
 	}
