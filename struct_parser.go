@@ -43,7 +43,7 @@ func (sp *StructParser) ParseSource(src interface{}) {
 }
 
 // GetAstStruct returns the ast.StructType specified by name
-// If the struct couldn't be found, the returned AST is nil and the error
+// If the struct couldn't be found, the returned AST is nil
 func (sp *StructParser) GetAstStruct(name string) *ast.StructType {
 	return sp.structs[name]
 }
