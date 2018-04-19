@@ -14,17 +14,15 @@ type Model struct {
 }
 
 // NewModel method creates a new model by given parameters and returns pointer to it
-func NewModel(name string) *Model {
-	return &Model{
+func NewModel(name string) Model {
+	return Model{
 		Name: name,
 	}
 }
 
 // AddField method adds field to end of the array
-func (m *Model) AddField(field ...Field) *Model {
+func (m *Model) AddField(field ...Field) {
 	m.Fields = append(m.Fields, field...)
-
-	return m
 }
 
 func (m Model) String() string {
