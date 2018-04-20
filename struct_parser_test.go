@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/madappgang/postman-doc-generator/models"
+	"github.com/madappgang/postman-doc-generator/sugar"
 )
 
 const structName = "User"
@@ -15,6 +16,7 @@ type User struct {
 	Name string
 	// User's age
 	Age  int
+	Languages []string
 }`
 
 var userModel = models.Model{
@@ -30,16 +32,20 @@ var userModel = models.Model{
 			Type:        "int",
 			Description: "User's age",
 		},
+		{
+			Name:        "Languages",
+			Type:        "",
+			Description: "",
+		},
 	},
 }
 
-func TestGetAstStruct(t *testing.T) {
-	sp := NewStructParser()
-	sp.ParseSource(userStruct)
+func TestParseSource(t *testing.T) {
+	structs := ParseSource(userStruct)
+	got := structs[structName]
 
-	got := sp.GetAstStruct(structName)
 	if got == nil {
-		t.Fatalf("GetAstStruct (%q) was incorrect, got: %v, want: %v.", userStruct, got, "not null")
+		t.Fatalf("ParseSource was incorrect, struct is not found.")
 	}
 }
 
@@ -47,11 +53,10 @@ func TestStructToModel(t *testing.T) {
 	in := userStruct
 	want := userModel
 
-	sp := NewStructParser()
-	sp.ParseSource(in)
-	st := sp.GetAstStruct(want.Name)
+	structs := ParseSource(in)
+	st := structs[want.Name]
 
-	got := structToModel(want.Name, *st)
+	got := sugar.ParseStruct(want.Name, *st)
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("StructToModel (%q) was incorrect, got: %q, want: %q.", in, got, want)
 	}
