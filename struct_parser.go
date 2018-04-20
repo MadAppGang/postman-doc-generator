@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -13,19 +12,19 @@ import (
 // StructParser represents a struct parser
 type StructParser struct {
 	structs map[string]*ast.StructType
-	fset    *token.FileSet
+	fset    token.FileSet
 }
 
 // NewStructParser creates a new struct parser
-func NewStructParser() *StructParser {
-	return &StructParser{
-		fset: token.NewFileSet(),
+func NewStructParser() StructParser {
+	return StructParser{
+		fset: *token.NewFileSet(),
 	}
 }
 
 // ParseFile parses the file specified by filename
 func (sp *StructParser) ParseFile(filename string) {
-	node, err := parser.ParseFile(sp.fset, filename, nil, parser.ParseComments)
+	node, err := parser.ParseFile(&sp.fset, filename, nil, parser.ParseComments)
 	if err != nil {
 		panic(err)
 	}
@@ -35,7 +34,7 @@ func (sp *StructParser) ParseFile(filename string) {
 
 // ParseSource parses the source code of a single Go source file
 func (sp *StructParser) ParseSource(src interface{}) {
-	node, err := parser.ParseFile(sp.fset, "", src, parser.ParseComments)
+	node, err := parser.ParseFile(&sp.fset, "", src, parser.ParseComments)
 	if err != nil {
 		panic(err)
 	}
@@ -43,18 +42,14 @@ func (sp *StructParser) ParseSource(src interface{}) {
 	sp.structs = collectStructs(node)
 }
 
-// GetStruct returns the ast.StructType specified by name
-// If the struct couldn't be found, the returned AST is nil and the error
-func (sp *StructParser) GetStruct(name string) (*ast.StructType, error) {
-	if sp.structs[name] == nil {
-		return nil, errors.New("not found")
-	}
-
-	return sp.structs[name], nil
+// GetAstStruct returns the ast.StructType specified by name
+// If the struct couldn't be found, the returned AST is nil
+func (sp *StructParser) GetAstStruct(name string) *ast.StructType {
+	return sp.structs[name]
 }
 
 // structToModel converts specified struct to model and returns it
-func structToModel(name string, st ast.StructType) *models.Model {
+func structToModel(name string, st ast.StructType) models.Model {
 	model := models.NewModel(name)
 	var fields []models.Field
 	for _, field := range st.Fields.List {
@@ -62,7 +57,7 @@ func structToModel(name string, st ast.StructType) *models.Model {
 		fieldType := getName(field.Type)
 		fieldDesc := getDocsByField(field)
 		f := models.NewField(fieldName, fieldType, fieldDesc)
-		fields = append(fields, *f)
+		fields = append(fields, f)
 	}
 	model.AddField(fields...)
 	return model
