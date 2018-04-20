@@ -8,8 +8,8 @@ type Field struct {
 }
 
 // NewField method creates a new field by given parameters and returns pointer to it
-func NewField(name, t, description string) *Field {
-	return &Field{
+func NewField(name, t, description string) Field {
+	return Field{
 		Name:        name,
 		Type:        t,
 		Description: description,
