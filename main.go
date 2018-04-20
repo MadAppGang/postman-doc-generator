@@ -45,11 +45,15 @@ func main() {
 		args = []string{"."}
 	}
 
+	generator := NewGenerator(structs)
+
 	var dir string
 	if len(args) == 1 && isDirectory(args[0]) {
 		dir = args[0]
+		generator.ParseDir(dir)
 	} else {
 		dir = filepath.Dir(args[0])
+		generator.ParseFiles(args)
 	}
 
 	inputName := *input
@@ -59,6 +63,12 @@ func main() {
 	fmt.Printf("Structs for conversion: %+v\n", structs)
 	fmt.Printf("Input file name: %s\n", inputName)
 	fmt.Printf("Output file name: %s\n", outputName)
+
+	models := generator.GetModels()
+	fmt.Println("Found models:")
+	for _, model := range models {
+		fmt.Printf("%s\n", model)
+	}
 }
 
 // isDirectory returns true if the named file is a directory
