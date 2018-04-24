@@ -48,7 +48,7 @@ func (sp *StructParser) ParseSource(src interface{}) {
 func (sp *StructParser) GetAstStruct(name string) (ast.StructType, error) {
 	st, ok := sp.structs[name]
 	if !ok {
-		return st, errors.New("Structure not found")
+		return st, errors.New("not found")
 	}
 
 	return st, nil

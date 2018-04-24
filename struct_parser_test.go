@@ -39,7 +39,7 @@ func TestGetAstStruct(t *testing.T) {
 
 	_, err := sp.GetAstStruct(structName)
 	if err != nil {
-		t.Fatalf("GetAstStruct (%q) was incorrect, got error: %v.", userStruct, err)
+		t.Fatalf("Structure %v %v", structName, err)
 	}
 }
 
