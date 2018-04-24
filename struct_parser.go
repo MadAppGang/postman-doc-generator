@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -11,7 +12,7 @@ import (
 
 // StructParser represents a struct parser
 type StructParser struct {
-	structs map[string]*ast.StructType
+	structs map[string]ast.StructType
 	fset    token.FileSet
 }
 
@@ -44,8 +45,13 @@ func (sp *StructParser) ParseSource(src interface{}) {
 
 // GetAstStruct returns the ast.StructType specified by name
 // If the struct couldn't be found, the returned AST is nil
-func (sp *StructParser) GetAstStruct(name string) *ast.StructType {
-	return sp.structs[name]
+func (sp *StructParser) GetAstStruct(name string) (ast.StructType, error) {
+	st, ok := sp.structs[name]
+	if !ok {
+		return st, errors.New("not found")
+	}
+
+	return st, nil
 }
 
 // structToModel converts specified struct to model and returns it
@@ -78,8 +84,8 @@ func getDocsByField(f *ast.Field) string {
 }
 
 // collectStructs inspects specified node, by adding struct types to map and returns it
-func collectStructs(node ast.Node) map[string]*ast.StructType {
-	structs := make(map[string]*ast.StructType, 0)
+func collectStructs(node ast.Node) map[string]ast.StructType {
+	structs := make(map[string]ast.StructType, 0)
 
 	ast.Inspect(node, func(x ast.Node) bool {
 		ts, ok := x.(*ast.TypeSpec)
@@ -93,7 +99,7 @@ func collectStructs(node ast.Node) map[string]*ast.StructType {
 		}
 
 		structName := ts.Name.Name
-		structs[structName] = st
+		structs[structName] = *st
 
 		return true
 	})
