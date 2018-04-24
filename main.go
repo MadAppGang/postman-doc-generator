@@ -40,6 +40,10 @@ func main() {
 		os.Exit(2)
 	}
 
+	if !isDirectory(*dir) {
+		log.Fatalf("%s is not directory", *dir)
+	}
+
 	structs := strings.Split(*structNames, ",")
 
 	fmt.Printf("Dir: %s\n", *dir)
