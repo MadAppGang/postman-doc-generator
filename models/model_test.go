@@ -21,6 +21,7 @@ Parameter | Type | Description
 --------- | ---- | -----------
 First field | string | Description for first field
 Second field | number | Description for second field
+
 `,
 	}
 
