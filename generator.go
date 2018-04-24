@@ -47,17 +47,7 @@ func (g *Generator) ParseFiles(names []string) {
 
 // ParseFile method parses specified file by name and adds necessary structs to the generator.
 func (g *Generator) ParseFile(name string) {
-	structs := ParseFile(name)
-	for _, structName := range g.structNames {
-		if structs[structName] != nil {
-			if g.structs[structName] != nil {
-				log.Printf("Repeated struct name %s. Skip it\n", structName)
-				continue
-			}
-
-			g.structs[structName] = structs[structName]
-		}
-	}
+	g.structs = ParseFile(name)
 }
 
 // GetModels method transformations found structs to models and returns it.
