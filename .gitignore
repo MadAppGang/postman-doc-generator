@@ -2,3 +2,4 @@ postman-doc-generator
 *.out
 *.md
 *.ast
+*.test
