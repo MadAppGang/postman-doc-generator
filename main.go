@@ -22,18 +22,9 @@ var (
 	dir         = flag.String("dir", defaultDirectory, "directory to find structures")
 )
 
-// Usage is a replacement usage function for the flags package
-func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\t%s [flags] -struct=S\n", appName)
-	fmt.Fprintf(os.Stderr, "Flags:\n")
-	flag.PrintDefaults()
-}
-
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix(appName + ": ")
-	flag.Usage = Usage
 	flag.Parse()
 	if len(*structNames) == 0 {
 		flag.Usage()
