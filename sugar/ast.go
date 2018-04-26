@@ -36,9 +36,11 @@ func getName(expr ast.Expr) string {
 	case *ast.MapType:
 		return fmt.Sprintf("map[%s]%s", getName(x.Key), getName(x.Value))
 	case *ast.SelectorExpr:
-		return fmt.Sprintf("%s.%s", getName(x.X), getName(x.Sel))
+		return fmt.Sprintf("%s", getName(x.Sel))
 	case *ast.StarExpr:
 		return getName(x.X)
+	case *ast.StructType:
+		return "struct"
 	}
 	return ""
 }
