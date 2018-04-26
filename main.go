@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -21,18 +20,9 @@ var (
 	flagOutput = flag.String("output", defaultOutputFilename, "postman collection filename")
 )
 
-// Usage is a replacement usage function for the flags package
-func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\t%s [flags]\n", appName)
-	fmt.Fprintf(os.Stderr, "Flags:\n")
-	flag.PrintDefaults()
-}
-
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix(appName + ": ")
-	flag.Usage = Usage
 	flag.Parse()
 
 	var structs []string
