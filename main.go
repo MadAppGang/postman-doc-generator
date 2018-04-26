@@ -4,8 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/madappgang/postman-doc-generator/models/postman"
@@ -13,58 +11,37 @@ import (
 
 const (
 	appName               = "postman-doc-generator"
-	defaultInputFileName  = "postman_collection_tpl.json"
-	defaultOutputFileName = "postman_collection.json"
+	defaultOutputFilename = "postman_collection.json"
+	defaultDir            = "."
 )
 
 var (
-	structNames = flag.String("struct", "", "comma-separated list of struct names; must be set")
-	input       = flag.String("input", defaultInputFileName, "file name of postman collection with keywords for replacement they to models; default srcdir/"+defaultInputFileName)
-	output      = flag.String("output", defaultOutputFileName, "output file name; default srcdir/"+defaultOutputFileName)
+	flagStruct = flag.String("struct", "", "comma-separated list of struct names")
+	flagFile   = flag.String("file", "", "go filename to be parsed")
+	flagDir    = flag.String("dir", defaultDir, "directory to be parsed")
+	flagOutput = flag.String("output", defaultOutputFilename, "postman collection filename")
 )
-
-// Usage is a replacement usage function for the flags package
-func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\t%s [flags] -struct S [directory]\n", appName)
-	fmt.Fprintf(os.Stderr, "Flags:\n")
-	flag.PrintDefaults()
-}
 
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix(appName + ": ")
-	flag.Usage = Usage
 	flag.Parse()
-	if len(*structNames) == 0 {
-		flag.Usage()
-		os.Exit(2)
-	}
 
-	structs := strings.Split(*structNames, ",")
-	args := flag.Args()
-	if len(args) == 0 {
-		args = []string{"."}
+	var structs []string
+	if len(*flagStruct) > 0 {
+		structs = strings.Split(*flagStruct, ",")
 	}
-
 	generator := NewGenerator(structs)
 
-	var dir string
-	if len(args) == 1 && isDirectory(args[0]) {
-		dir = args[0]
-		generator.ParseDir(dir)
+	if *flagFile != "" {
+		generator.ParseFile(*flagFile)
 	} else {
-		dir = filepath.Dir(args[0])
-		generator.ParseFiles(args)
+		generator.ParseDir(*flagDir)
 	}
 
-	inputName := *input
-	outputName := *output
-
-	fmt.Printf("Dir: %s\n", dir)
+	fmt.Printf("Dir: %s\n", *flagDir)
 	fmt.Printf("Structs for conversion: %+v\n", structs)
-	fmt.Printf("Input file name: %s\n", inputName)
-	fmt.Printf("Output file name: %s\n", outputName)
+	fmt.Printf("Postman filename: %s\n", *flagOutput)
 
 	models := generator.GetModels()
 	fmt.Println("Found models:")
@@ -85,13 +62,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-// isDirectory returns true if the named file is a directory
-func isDirectory(name string) bool {
-	info, err := os.Stat(name)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return info.IsDir()
 }
