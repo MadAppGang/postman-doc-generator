@@ -1,6 +1,7 @@
 package sugar
 
 import (
+	"fmt"
 	"go/ast"
 	"strings"
 
@@ -12,6 +13,9 @@ func ParseStruct(name string, st ast.StructType) models.Model {
 	model := models.NewModel(name)
 	var fields []models.Field
 	for _, field := range st.Fields.List {
+		if !isExported(field.Names[0].Name) {
+			continue
+		}
 		fieldName := field.Names[0].Name
 		fieldType := getName(field.Type)
 		fieldDesc := getDocsByField(field)
@@ -24,11 +28,24 @@ func ParseStruct(name string, st ast.StructType) models.Model {
 
 // getName returns name from the specified expression
 func getName(expr ast.Expr) string {
-	ident, ok := expr.(*ast.Ident)
-	if !ok {
-		return ""
+	switch x := expr.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.ArrayType:
+		return fmt.Sprintf("[]%s", getName(x.Elt))
+	case *ast.MapType:
+		return fmt.Sprintf("map[%s]%s", getName(x.Key), getName(x.Value))
+	case *ast.SelectorExpr:
+		return fmt.Sprintf("%s.%s", getName(x.X), getName(x.Sel))
+	case *ast.StarExpr:
+		return getName(x.X)
 	}
-	return ident.Name
+	return ""
+}
+
+// isExported returns true if the first character is capital letter.
+func isExported(name string) bool {
+	return 'A' <= name[0] && name[0] <= 'Z'
 }
 
 // getDocsByField returns the text of the comment specified by field

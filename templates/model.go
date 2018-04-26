@@ -1,7 +1,7 @@
 package templates
 
 // ModelTmpl is markdown template to export a model
-var ModelTmpl = `# {{$.Name}}
+var ModelTmpl = `### {{$.Name}}
 
 Parameter | Type | Description
 --------- | ---- | -----------{{range $i, $field := $.Fields}}

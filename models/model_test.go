@@ -15,17 +15,19 @@ func TestString(t *testing.T) {
 
 	c := modelToStringCase{
 		in: NewModel("First model"),
-		want: `First model
+		want: `### First model
+
 Parameter | Type | Description
 --------- | ---- | -----------
 First field | string | Description for first field
-Second field | number | Description for second field`,
+Second field | number | Description for second field
+`,
 	}
 
 	c.in.AddField(field1, field2)
 
 	got := c.in.String()
 	if c.want != got {
-		t.Fatalf("Model.String (%q) was incorrect, got: %q, want: %q.", c.in, got, c.want)
+		t.Fatalf("Model.String was incorrect, got: %q, want: %q.", got, c.want)
 	}
 }
