@@ -28,7 +28,9 @@ func main() {
 	if len(*flagStruct) > 0 {
 		structs = strings.Split(*flagStruct, ",")
 	}
+
 	generator := NewGenerator(structs)
+	generator.ParseSource(*flagSource)
 
 	fmt.Printf("Source: %s\n", *flagSource)
 	fmt.Printf("Structs for conversion: %+v\n", structs)
