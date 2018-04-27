@@ -34,6 +34,7 @@ func (g *Generator) ParseDir(dir string) {
 	}
 
 	names = append(names, pkg.GoFiles...)
+	names = sugar.PrefixDirectory(dir, names)
 
 	g.ParseFiles(names)
 }
@@ -59,6 +60,15 @@ func (g *Generator) ParseFile(name string) {
 		for stName, st := range structs {
 			g.structs[stName] = st
 		}
+	}
+}
+
+// ParseSource method parses directory or file depending on the source
+func (g *Generator) ParseSource(source string) {
+	if sugar.IsDirectory(source) {
+		g.ParseDir(source)
+	} else {
+		g.ParseFile(source)
 	}
 }
 
