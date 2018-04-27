@@ -8,16 +8,15 @@ import (
 )
 
 const (
-	appName               = "postman-doc-generator"
-	defaultOutputFilename = "postman_collection.json"
-	defaultDir            = "."
+	appName       = "postman-doc-generator"
+	defaultOutput = "postman_collection.json"
+	defaultSource = "."
 )
 
 var (
 	flagStruct = flag.String("struct", "", "comma-separated list of struct names")
-	flagFile   = flag.String("file", "", "go filename to be parsed")
-	flagDir    = flag.String("dir", defaultDir, "directory to be parsed")
-	flagOutput = flag.String("output", defaultOutputFilename, "postman collection filename")
+	flagSource = flag.String("source", defaultSource, "filename or directory to be parsed")
+	flagOutput = flag.String("output", defaultOutput, "postman collection filename")
 )
 
 func main() {
@@ -31,13 +30,7 @@ func main() {
 	}
 	generator := NewGenerator(structs)
 
-	if *flagFile != "" {
-		generator.ParseFile(*flagFile)
-	} else {
-		generator.ParseDir(*flagDir)
-	}
-
-	fmt.Printf("Dir: %s\n", *flagDir)
+	fmt.Printf("Source: %s\n", *flagSource)
 	fmt.Printf("Structs for conversion: %+v\n", structs)
 	fmt.Printf("Postman filename: %s\n", *flagOutput)
 
