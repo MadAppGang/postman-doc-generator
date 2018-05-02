@@ -5,12 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"regexp"
+
+	"github.com/madappgang/postman-doc-generator/models"
 )
 
 const modelsItemName = "Models"
 
 var errInvalidNode = errors.New("node is invalid")
 var errNotFound = errors.New("not found")
+var modelPattern = regexp.MustCompile(`#+\s(\w+)[^#]*`)
 
 // Schema is the postman schema.
 type Schema struct {
@@ -37,7 +41,7 @@ func ParseFile(filename string) Schema {
 	return schema
 }
 
-// GetModels returns a models from the schema.
+// GetModels returns all models as a string from the schema.
 func (s *Schema) GetModels() (string, error) {
 	item, err := s.findItemByName(modelsItemName)
 	if err != nil {
@@ -122,4 +126,44 @@ func (s *Schema) Save(filename string) error {
 	}
 
 	return ioutil.WriteFile(filename, data, 0644)
+}
+
+// AddModels adds new models to schema
+// Non nil verbose error returns if something goes wrong
+func (s *Schema) AddModels(newModels []models.Model) error {
+	models, err := s.getModelsMap()
+	if err != nil {
+		return err
+	}
+
+	for _, newModel := range newModels {
+		models[newModel.Name] = newModel.String()
+	}
+
+	var str string
+	for _, model := range models {
+		str += model
+	}
+	s.SetModels(str)
+
+	return nil
+}
+
+// getModelsMap returns all models as map from schema
+// Non nil verbose error returns if something goes wrong
+func (s *Schema) getModelsMap() (map[string]string, error) {
+	m := make(map[string]string)
+
+	models, err := s.GetModels()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, submatches := range modelPattern.FindAllSubmatch([]byte(models), -1) {
+		model := string(submatches[0])
+		modelName := string(submatches[1])
+		m[modelName] = model
+	}
+
+	return m, nil
 }

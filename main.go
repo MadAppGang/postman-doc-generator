@@ -44,16 +44,13 @@ func main() {
 		fmt.Printf("%s\n", model)
 	}
 
-	postmanSchema := postman.ParseFile(inputName)
-
-	var newModels string
-	for _, model := range models {
-		newModels += model.String()
+	postmanSchema := postman.ParseFile(*flagOutput)
+	err := postmanSchema.AddModels(models)
+	if err != nil {
+		log.Fatalf("fail to get models. %v", err)
 	}
 
-	postmanSchema.SetModels(newModels)
-
-	err := postmanSchema.Save(outputName)
+	err = postmanSchema.Save(*flagOutput)
 	if err != nil {
 		log.Fatal(err)
 	}
