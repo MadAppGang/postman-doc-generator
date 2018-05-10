@@ -120,7 +120,7 @@ func (s *Schema) SetModels(models string) {
 
 // Save saves the schema to file and returns nil.
 func (s *Schema) Save(filename string) error {
-	data, err := json.Marshal(s.node)
+	data, err := json.MarshalIndent(s.node, "", "\t")
 	if err != nil {
 		return err
 	}
