@@ -1,6 +1,6 @@
 # Postman documents generator
 
-Postman documents generator is a tool for generating models from the structures in source files and add them to postman collection schema.
+Postman documents generator is a tool for generating models from the structures in source files and adding them to postman collection schema.
 
 For example, if we have a struct type called `User`,
 
@@ -22,7 +22,7 @@ run the command below in the same directory
 
 postman-doc-generator -struct=User
 
-it will create the model used Markdown syntax
+it will create the model using Markdown syntax
 
 ```text
     ### User
