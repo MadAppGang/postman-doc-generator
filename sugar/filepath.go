@@ -15,14 +15,14 @@ func IsDirectory(name string) bool {
 	return info.IsDir()
 }
 
-// PrefixDirectory places the directory name at the beginning of each name in the list.
-func PrefixDirectory(directory string, names []string) []string {
-	if directory == "." {
+// AddPathPrefix places the path at the beginning of each name in the list.
+func AddPathPrefix(path string, names []string) []string {
+	if path == "." {
 		return names
 	}
 	ret := make([]string, len(names))
 	for i, name := range names {
-		ret[i] = filepath.Join(directory, name)
+		ret[i] = filepath.Join(path, name)
 	}
 	return ret
 }

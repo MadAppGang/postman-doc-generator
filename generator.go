@@ -27,14 +27,12 @@ func NewGenerator(structNames []string) Generator {
 
 // ParseDir method parses go source files from the specified directory.
 func (g *Generator) ParseDir(dir string) {
-	var names []string
 	pkg, err := build.Default.ImportDir(dir, build.IgnoreVendor)
 	if err != nil {
 		log.Fatalf("cannot process directory %s: %s", dir, err)
 	}
 
-	names = append(names, pkg.GoFiles...)
-	names = sugar.PrefixDirectory(dir, names)
+	names := sugar.AddPathPrefix(dir, pkg.GoFiles)
 
 	g.ParseFiles(names)
 }
@@ -77,7 +75,7 @@ func (g *Generator) GetModels() []models.Model {
 	var models []models.Model
 
 	for name, st := range g.structs {
-		model := sugar.ParseStruct(name, st)
+		model := ParseStruct(name, st)
 		models = append(models, model)
 	}
 
