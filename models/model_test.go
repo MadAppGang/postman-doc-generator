@@ -15,11 +15,13 @@ func TestString(t *testing.T) {
 
 	c := modelToStringCase{
 		in: NewModel("First model"),
-		want: `First model
+		want: `### First model
+
 Parameter | Type | Description
 --------- | ---- | -----------
 First field | string | Description for first field
-Second field | number | Description for second field`,
+Second field | number | Description for second field
+`,
 	}
 
 	c.in.AddField(field1, field2)
