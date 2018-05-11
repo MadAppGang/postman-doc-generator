@@ -35,7 +35,7 @@ it will create the model using Markdown syntax
     created_at | Time | Time of user creation
 ```
 
-and puts it into the file postman_collection.json.
+and put it into the file postman_collection.json.
 
 Typically this process would be run using go generate, like this:
 
@@ -43,6 +43,6 @@ Typically this process would be run using go generate, like this:
     //go:generate postman-doc-generator -struct=User
 ```
 
-With no arguments, it processes the package in the current directory. Otherwise, the flag -source accepts name of directory with Go source files that are belong to a single Go package.
+With no arguments, it processes the package in the current directory. Otherwise, the flag -source accepts the name of directory with Go source files that belong to a single Go package.
 
 The -struct flag accepts a comma-separated list of structs for generating multiple structs at once.
