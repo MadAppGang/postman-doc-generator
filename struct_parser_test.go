@@ -29,3 +29,22 @@ func TestCollectStructsLen(t *testing.T) {
 		t.Fatalf("Structs length was incorrect, got: %v, want: %v", got, want)
 	}
 }
+
+func TestIsExportedName(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{"A", true},
+		{"Z", true},
+		{"a", false},
+		{"z", false},
+	}
+
+	for _, c := range cases {
+		got := isExportedName(c.in)
+		if got != c.want {
+			t.Errorf("isExportedName(%s) was incorrect, got: %v, want: %v", c.in, got, c.want)
+		}
+	}
+}

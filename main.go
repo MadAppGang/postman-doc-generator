@@ -5,19 +5,20 @@ import (
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/madappgang/postman-doc-generator/models/postman"
 )
 
 const (
-	appName               = "postman-doc-generator"
-	defaultOutputFilename = "postman_collection.json"
-	defaultDir            = "."
+	appName       = "postman-doc-generator"
+	defaultOutput = "postman_collection.json"
+	defaultSource = "."
 )
 
 var (
 	flagStruct = flag.String("struct", "", "comma-separated list of struct names")
-	flagFile   = flag.String("file", "", "go filename to be parsed")
-	flagDir    = flag.String("dir", defaultDir, "directory to be parsed")
-	flagOutput = flag.String("output", defaultOutputFilename, "postman collection filename")
+	flagSource = flag.String("source", defaultSource, "filename or directory to be parsed")
+	flagOutput = flag.String("output", defaultOutput, "postman collection filename")
 )
 
 func main() {
@@ -29,15 +30,11 @@ func main() {
 	if len(*flagStruct) > 0 {
 		structs = strings.Split(*flagStruct, ",")
 	}
+
 	generator := NewGenerator(structs)
+	generator.ParseSource(*flagSource)
 
-	if *flagFile != "" {
-		generator.ParseFile(*flagFile)
-	} else {
-		generator.ParseDir(*flagDir)
-	}
-
-	fmt.Printf("Dir: %s\n", *flagDir)
+	fmt.Printf("Source: %s\n", *flagSource)
 	fmt.Printf("Structs for conversion: %+v\n", structs)
 	fmt.Printf("Postman filename: %s\n", *flagOutput)
 
@@ -45,5 +42,16 @@ func main() {
 	fmt.Println("Found models:")
 	for _, model := range models {
 		fmt.Printf("%s\n", model)
+	}
+
+	postmanSchema := postman.ParseFile(*flagOutput)
+	err := postmanSchema.AddModels(models)
+	if err != nil {
+		log.Fatalf("fail to get models. %v", err)
+	}
+
+	err = postmanSchema.Save(*flagOutput)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
