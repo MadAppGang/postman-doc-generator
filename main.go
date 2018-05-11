@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/madappgang/postman-doc-generator/models/postman"
 )
 
 const (
@@ -40,5 +42,16 @@ func main() {
 	fmt.Println("Found models:")
 	for _, model := range models {
 		fmt.Printf("%s\n", model)
+	}
+
+	postmanSchema := postman.ParseFile(*flagOutput)
+	err := postmanSchema.AddModels(models)
+	if err != nil {
+		log.Fatalf("fail to get models. %v", err)
+	}
+
+	err = postmanSchema.Save(*flagOutput)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
