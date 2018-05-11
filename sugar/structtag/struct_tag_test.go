@@ -41,7 +41,7 @@ func TestGetName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetName(tt.args.tag, tt.args.key); got != tt.want {
+			if got := GetNameFromTag(tt.args.tag, tt.args.key); got != tt.want {
 				t.Errorf("GetName() = %v, want %v", got, tt.want)
 			}
 		})

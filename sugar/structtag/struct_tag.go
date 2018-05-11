@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-// GetName extracts name from tag by specified key and returns it.
+// GetNameFromTag extracts name from tag by specified key and returns it.
 // If key is missing in tag returns empty string.
-func GetName(tag, key string) string {
+func GetNameFromTag(tag, key string) string {
 	st := reflect.StructTag(tag)
 	name := st.Get(key)
 

@@ -78,7 +78,7 @@ func getFieldName(field ast.Field) string {
 	}
 
 	tag := strings.Replace(field.Tag.Value, "`", "", -1)
-	name := structtag.GetName(tag, "json")
+	name := structtag.GetNameFromTag(tag, "json")
 	if name == "" {
 		name = strings.ToLower(field.Names[0].Name)
 	}
