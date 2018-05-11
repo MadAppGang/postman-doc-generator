@@ -1,6 +1,6 @@
 # Postman documents generator
 
-Postman documents generator is a tool to generate models from the structures of the source files and add them to postman collection schema.
+Postman documents generator is a tool for generating models from the structures in source files and add them to postman collection schema.
 
 For example, if we have a struct type called `User`,
 
@@ -18,11 +18,11 @@ For example, if we have a struct type called `User`,
     }
 ```
 
-running this command in the same directory
+run the command below in the same directory
 
 postman-doc-generator -struct=User
 
-creates the model used Markdown syntax
+it will create the model used Markdown syntax
 
 ```text
     ### User
@@ -43,6 +43,6 @@ Typically this process would be run using go generate, like this:
     //go:generate postman-doc-generator -struct=User
 ```
 
-With no arguments, it processes the package in the current directory. Otherwise, the flag -source accepts name a single directory holding a Go package or a set of Go source files that represent a single Go package.
+With no arguments, it processes the package in the current directory. Otherwise, the flag -source accepts name of directory with Go source files that are belong to a single Go package.
 
-The -struct flag accepts a comma-separated list of structs so a single run can generate methods for multiple structs.
+The -struct flag accepts a comma-separated list of structs for generating multiple structs in a single run.
