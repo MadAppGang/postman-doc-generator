@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -10,52 +9,53 @@ import (
 	"github.com/madappgang/postman-doc-generator/models"
 )
 
-// StructParser represents a struct parser
-type StructParser struct {
-	structs map[string]ast.StructType
-	fset    token.FileSet
-}
-
-// NewStructParser creates a new struct parser
-func NewStructParser() StructParser {
-	return StructParser{
-		fset: *token.NewFileSet(),
-	}
-}
-
 // ParseFile parses the file specified by filename
-func (sp *StructParser) ParseFile(filename string) {
-	node, err := parser.ParseFile(&sp.fset, filename, nil, parser.ParseComments)
-	if err != nil {
-		panic(err)
-	}
-
-	sp.structs = collectStructs(node)
+func ParseFile(filename string) map[string]ast.StructType {
+	return parse(filename, nil)
 }
 
 // ParseSource parses the source code of a single Go source file
-func (sp *StructParser) ParseSource(src interface{}) {
-	node, err := parser.ParseFile(&sp.fset, "", src, parser.ParseComments)
+func ParseSource(src interface{}) map[string]ast.StructType {
+	return parse("", src)
+}
+
+// collectStructs inspects specified node, by adding struct types to map and returns it
+func collectStructs(node ast.Node) map[string]ast.StructType {
+	structs := make(map[string]ast.StructType, 0)
+
+	ast.Inspect(node, func(x ast.Node) bool {
+		ts, ok := x.(*ast.TypeSpec)
+		if !ok {
+			return true
+		}
+
+		st, ok := ts.Type.(*ast.StructType)
+		if !ok {
+			return true
+		}
+
+		structName := ts.Name.Name
+		structs[structName] = *st
+
+		return true
+	})
+
+	return structs
+}
+
+// parse method parses the file specified by filename or the source code of a single Go source file
+func parse(filename string, src interface{}) map[string]ast.StructType {
+	fs := token.NewFileSet()
+	node, err := parser.ParseFile(fs, filename, src, parser.ParseComments)
 	if err != nil {
 		panic(err)
 	}
 
-	sp.structs = collectStructs(node)
+	return collectStructs(node)
 }
 
-// GetAstStruct returns the ast.StructType specified by name
-// If the struct couldn't be found, the returned AST is nil
-func (sp *StructParser) GetAstStruct(name string) (ast.StructType, error) {
-	st, ok := sp.structs[name]
-	if !ok {
-		return st, errors.New("not found")
-	}
-
-	return st, nil
-}
-
-// structToModel converts specified struct to model and returns it
-func structToModel(name string, st ast.StructType) models.Model {
+// ParseStruct converts specified struct to model and returns it
+func ParseStruct(name string, st ast.StructType) models.Model {
 	model := models.NewModel(name)
 	var fields []models.Field
 	for _, field := range st.Fields.List {
@@ -81,28 +81,4 @@ func getName(expr ast.Expr) string {
 // getDocsByField returns the text of the comment specified by field
 func getDocsByField(f *ast.Field) string {
 	return strings.TrimSuffix(f.Doc.Text(), "\n")
-}
-
-// collectStructs inspects specified node, by adding struct types to map and returns it
-func collectStructs(node ast.Node) map[string]ast.StructType {
-	structs := make(map[string]ast.StructType, 0)
-
-	ast.Inspect(node, func(x ast.Node) bool {
-		ts, ok := x.(*ast.TypeSpec)
-		if !ok {
-			return true
-		}
-
-		st, ok := ts.Type.(*ast.StructType)
-		if !ok {
-			return true
-		}
-
-		structName := ts.Name.Name
-		structs[structName] = *st
-
-		return true
-	})
-
-	return structs
 }

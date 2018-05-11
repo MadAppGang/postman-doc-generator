@@ -29,7 +29,16 @@ func main() {
 		structs = strings.Split(*flagStruct, ",")
 	}
 
+	generator := NewGenerator(structs)
+	generator.ParseSource(*flagSource)
+
 	fmt.Printf("Source: %s\n", *flagSource)
 	fmt.Printf("Structs for conversion: %+v\n", structs)
 	fmt.Printf("Postman filename: %s\n", *flagOutput)
+
+	models := generator.GetModels()
+	fmt.Println("Found models:")
+	for _, model := range models {
+		fmt.Printf("%s\n", model)
+	}
 }
