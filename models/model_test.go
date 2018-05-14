@@ -28,6 +28,6 @@ Second field | number | Description for second field
 
 	got := c.in.String()
 	if c.want != got {
-		t.Fatalf("Model.String (%q) was incorrect, got: %q, want: %q.", c.in, got, c.want)
+		t.Fatalf("Model.String was incorrect, got: %q, want: %q.", got, c.want)
 	}
 }
