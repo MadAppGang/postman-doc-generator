@@ -35,10 +35,10 @@ func TestIsExportedName(t *testing.T) {
 		in   string
 		want bool
 	}{
-		{"A", true},
-		{"Z", true},
-		{"a", false},
-		{"z", false},
+		{"Abc", true},
+		{"Zyx", true},
+		{"abc", false},
+		{"zyx", false},
 	}
 
 	for _, c := range cases {
