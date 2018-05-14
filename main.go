@@ -46,7 +46,7 @@ func main() {
 
 	postmanSchema, err := postman.ParseFile(*flagOutput)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("fail to parse postman file. %v", err)
 	}
 
 	err = postmanSchema.AddModels(models)

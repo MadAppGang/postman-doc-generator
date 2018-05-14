@@ -38,11 +38,30 @@ func ParseFile(filename string) (Schema, error) {
 	return schema, err
 }
 
+// createModelsItem creates item for models and returns nil
+func (s *Schema) createModelsItem() (*map[string]interface{}, error) {
+	item, err := s.addItem(modelsItemName, "")
+	if err != nil {
+		return nil, err
+	}
+
+	s.modelsItem = item
+
+	return item, nil
+}
+
 // GetModels returns all models as a string from the schema.
 func (s *Schema) GetModels() (string, error) {
 	item, err := s.findItemByName(modelsItemName)
 	if err != nil {
-		return "", fmt.Errorf("Cannot find models node: %s", err)
+		if err == errNotFound {
+			item, err = s.createModelsItem()
+			if err != nil {
+				return "", fmt.Errorf("Cannot create models node: %s", err)
+			}
+		} else {
+			return "", fmt.Errorf("Cannot find models node: %s", err)
+		}
 	}
 
 	description, ok := (*item)["description"].(string)
