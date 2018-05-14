@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -61,6 +62,9 @@ func ParseStruct(name string, st ast.StructType) models.Model {
 	var fields []models.Field
 	for _, field := range st.Fields.List {
 		fieldName := getFieldName(*field)
+		if !isExportedName(field.Names[0].Name) || fieldName == structtag.Unexported {
+			continue
+		}
 		fieldType := getExprName(field.Type)
 		fieldDesc := getDocsByField(field)
 		f := models.NewField(fieldName, fieldType, fieldDesc)
@@ -88,11 +92,26 @@ func getFieldName(field ast.Field) string {
 
 // getExprName returns name from the specified expression
 func getExprName(expr ast.Expr) string {
-	ident, ok := expr.(*ast.Ident)
-	if !ok {
-		return ""
+	switch x := expr.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.ArrayType:
+		return fmt.Sprintf("[]%s", getExprName(x.Elt))
+	case *ast.MapType:
+		return fmt.Sprintf("map[%s]%s", getExprName(x.Key), getExprName(x.Value))
+	case *ast.SelectorExpr:
+		return fmt.Sprintf("%s", getExprName(x.Sel))
+	case *ast.StarExpr:
+		return getExprName(x.X)
+	case *ast.StructType:
+		return "struct"
 	}
-	return ident.Name
+	return ""
+}
+
+// isExportedName returns true if the first character is capital letter.
+func isExportedName(name string) bool {
+	return 'A' <= name[0] && name[0] <= 'Z'
 }
 
 // getDocsByField returns the text of the comment specified by field
