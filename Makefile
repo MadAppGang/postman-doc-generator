@@ -8,4 +8,4 @@ testall:
 testrun:
 	go build
 	cp postman-doc-generator ~/go/bin/
-	cd test; postman-doc-generator -struct=User,Order
+	cd test; go generate
