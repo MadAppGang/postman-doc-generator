@@ -23,22 +23,19 @@ type Schema struct {
 }
 
 // ParseFile parses a file by filename, unmarshal data and returns schema.
-func ParseFile(filename string) Schema {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-
+func ParseFile(filename string) (Schema, error) {
 	schema := Schema{
 		node: make(map[string]interface{}),
 	}
 
-	err = json.Unmarshal(data, &schema.node)
+	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		return schema, err
 	}
 
-	return schema
+	err = json.Unmarshal(data, &schema.node)
+
+	return schema, err
 }
 
 // GetModels returns all models as a string from the schema.
