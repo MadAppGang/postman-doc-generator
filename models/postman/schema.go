@@ -23,29 +23,45 @@ type Schema struct {
 }
 
 // ParseFile parses a file by filename, unmarshal data and returns schema.
-func ParseFile(filename string) Schema {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-
+func ParseFile(filename string) (Schema, error) {
 	schema := Schema{
 		node: make(map[string]interface{}),
 	}
 
-	err = json.Unmarshal(data, &schema.node)
+	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		return schema, err
 	}
 
-	return schema
+	err = json.Unmarshal(data, &schema.node)
+
+	return schema, err
 }
 
-// GetModels returns all models as a string from the schema.
-func (s *Schema) GetModels() (string, error) {
+// insertModelsItem creates a model item, adds it into the schema and returns a pointer to the item.
+func (s *Schema) insertModelsItem() (*map[string]interface{}, error) {
+	item, err := s.addItem(modelsItemName, "")
+	if err != nil {
+		return nil, err
+	}
+
+	s.modelsItem = item
+
+	return item, nil
+}
+
+// getModels returns all models as a string from the schema.
+func (s *Schema) getModels() (string, error) {
 	item, err := s.findItemByName(modelsItemName)
 	if err != nil {
-		return "", fmt.Errorf("Cannot find models node: %s", err)
+		if err == errNotFound {
+			item, err = s.insertModelsItem()
+			if err != nil {
+				return "", fmt.Errorf("Cannot create models node: %s", err)
+			}
+		} else {
+			return "", fmt.Errorf("Cannot find models node: %s", err)
+		}
 	}
 
 	description, ok := (*item)["description"].(string)
@@ -154,7 +170,7 @@ func (s *Schema) AddModels(newModels []models.Model) error {
 func (s *Schema) getModelsMap() (map[string]string, error) {
 	m := make(map[string]string)
 
-	models, err := s.GetModels()
+	models, err := s.getModels()
 	if err != nil {
 		return nil, err
 	}

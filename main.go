@@ -34,8 +34,12 @@ func main() {
 	generator.ParseSource(*flagSource)
 
 	models := generator.GetModels()
-	postmanSchema := postman.ParseFile(*flagOutput)
-	err := postmanSchema.AddModels(models)
+	postmanSchema, err := postman.ParseFile(*flagOutput)
+	if err != nil {
+		log.Fatalf("fail to parse postman file. %v", err)
+	}
+
+	err = postmanSchema.AddModels(models)
 	if err != nil {
 		log.Fatalf("fail to get models. %v", err)
 	}
