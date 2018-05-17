@@ -1,0 +1,8 @@
+postman-doc-generator
+debug
+*.out
+*.md
+*.ast
+*.test
+/test
+.vscode/
