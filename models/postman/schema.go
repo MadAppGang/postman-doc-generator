@@ -38,7 +38,8 @@ func ParseFile(filename string) (Schema, error) {
 	return schema, err
 }
 
-// createModelsItem creates item for models and returns nil
+// createModelsItem creates an item in the schema to store models.
+// * should be used if this element is not present
 func (s *Schema) createModelsItem() (*map[string]interface{}, error) {
 	item, err := s.addItem(modelsItemName, "")
 	if err != nil {
@@ -50,8 +51,8 @@ func (s *Schema) createModelsItem() (*map[string]interface{}, error) {
 	return item, nil
 }
 
-// GetModels returns all models as a string from the schema.
-func (s *Schema) GetModels() (string, error) {
+// getModels returns all models as a string from the schema.
+func (s *Schema) getModels() (string, error) {
 	item, err := s.findItemByName(modelsItemName)
 	if err != nil {
 		if err == errNotFound {
@@ -170,7 +171,7 @@ func (s *Schema) AddModels(newModels []models.Model) error {
 func (s *Schema) getModelsMap() (map[string]string, error) {
 	m := make(map[string]string)
 
-	models, err := s.GetModels()
+	models, err := s.getModels()
 	if err != nil {
 		return nil, err
 	}
