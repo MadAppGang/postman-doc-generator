@@ -39,7 +39,6 @@ func ParseFile(filename string) (Schema, error) {
 }
 
 // createModelsItem creates an item in the schema to store models.
-// * should be used if this element is not present
 func (s *Schema) createModelsItem() (*map[string]interface{}, error) {
 	item, err := s.addItem(modelsItemName, "")
 	if err != nil {
