@@ -60,3 +60,9 @@ With no arguments, it processes the package in the current directory. Otherwise,
 The -struct flag accepts a comma-separated list of structs for generating multiple structs at once.
 
 The -output flag accepts a path to the postman schema file. By default, it is postman_collection.json.
+
+## License
+
+Copyright (c) MadAppGang. All rights reserved.
+
+Licensed under the [MIT](LICENSE) License.
