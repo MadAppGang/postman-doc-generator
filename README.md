@@ -46,3 +46,9 @@ Typically this process would be run using go generate, like this:
 With no arguments, it processes the package in the current directory. Otherwise, the flag -source accepts the name of directory with Go source files that belong to a single Go package.
 
 The -struct flag accepts a comma-separated list of structs for generating multiple structs at once.
+
+## License
+
+Copyright (c) MadAppGang. All rights reserved.
+
+Licensed under the [MIT](LICENSE) License.
