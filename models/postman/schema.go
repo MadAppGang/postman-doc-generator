@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/madappgang/postman-doc-generator/models"
+	"github.com/madappgang/postman-doc-generator/utils"
 )
 
 const modelsItemName = "Models"
@@ -20,6 +21,28 @@ var modelPattern = regexp.MustCompile(`#+\s(\w+)[^#]*`)
 type Schema struct {
 	node       map[string]interface{}
 	modelsItem *map[string]interface{}
+}
+
+// NewSchema creates the empty postman schema with specified name and returns it
+func NewSchema(name string) (Schema, error) {
+	info := make(map[string]string)
+
+	uuid, err := utils.NewUUID()
+	if err != nil {
+		return Schema{}, nil
+	}
+
+	info["_postman_id"] = uuid
+	info["name"] = name
+	info["schema"] = "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+
+	schema := Schema{
+		node: make(map[string]interface{}),
+	}
+	schema.node["info"] = info
+	schema.node["item"] = make([]interface{}, 0)
+
+	return schema, nil
 }
 
 // ParseFile parses a file by filename, unmarshal data and returns schema.

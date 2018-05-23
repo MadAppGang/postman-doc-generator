@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/madappgang/postman-doc-generator/models/postman"
@@ -34,9 +35,21 @@ func main() {
 	generator.ParseSource(*flagSource)
 
 	models := generator.GetModels()
-	postmanSchema, err := postman.ParseFile(*flagOutput)
-	if err != nil {
-		log.Fatalf("fail to parse postman file. %v", err)
+
+	var postmanSchema postman.Schema
+	_, err := os.Stat(*flagOutput)
+	if err == nil {
+		postmanSchema, err = postman.ParseFile(*flagOutput)
+		if err != nil {
+			log.Fatalf("fail to parse postman file. %v", err)
+		}
+	} else if os.IsNotExist(err) {
+		postmanSchema, err = postman.NewSchema("Collection")
+		if err != nil {
+			log.Fatalf("fail to create postman schema. %v", err)
+		}
+	} else {
+		log.Fatalf("fail to get information about the postman file. %v", err)
 	}
 
 	err = postmanSchema.AddModels(models)
